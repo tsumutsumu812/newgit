@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="love_tester.css">
+    <title>テスター</title>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar nav-pills navbar-expand-md navbar-dark bg-dark fixed-top">
+            <a href="#" class="navbar-brand">ブランド</a>
+            <button class = "navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarNav01" aria-controls="navbarNav01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id ="navbaNav">
+                <ul class ="navbar-nav">
+                    <li id="customer" class="nav-item active"><a v-on:click="customer" class="nav-link" href="#">新規入力</a></li>
+                    <li id="viewer" class="nav-item"><a v-on:click="viewer" class="nav-link" href="#">一覧</a></li>
+                </ul>
+            </div> 
+        </nav>
+               
+        <div v-if="inputting">
+            <h2>テスター</h2>
+            <table id="tbl1">
+                <thead>
+                    <tr>
+                        <th scope="col">顧客名</th>
+                        <th scope="col">年度</th>
+                        <th scope="col">担当営業</th>
+                        <th scope="col">継続/引継</th>
+                        <th scope="col">顧客ZONE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input v-model = "client" type="text"></td>
+                        <td><input v-model = "year" type="number"></td>
+                        <td><input v-model = "sales" type="text"></td>
+                        <td>
+                            <input v-model ="corr" value="継続" id ="continue" name ="type" type="radio"><label for="continue">継続</label>
+                            <input v-model ="corr"　value="引継"　id = "relation" name ="type" type="radio"><label for="relation">引継</label>
+                        </td>
+                        <td>
+                            <input v-model ="porg" value="P" id = "p" name="zone" type="radio"><label for="p">P</label>
+                            <input v-model ="porg" value="G" id = "g" name="zone" type="radio"><label for="g">G</label>
+                        </td>
+                    </tr>
+                </tbody>    
+            </table>
+            <table class="table-striped" id="tbl2">
+                <thead>
+                    <tr>
+                        <th scope ="col"></th>
+                        <th scope="col">設問</th>
+                        <th scope="col">回答</th>
+                        <th scope="col">得点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(question,index) in questions">
+                    <th scope="row">{{index+1}}</td>
+                    <td class="question">{{question}}</td>
+                    <!-- <td>
+                        <input :id = "index" type="radio" :name="index" :value="'a'+index"><label :for="index">YES</label>
+                        <input :id="index+'a'" type="radio" :name="index" :value="'b'+index" checked><label :for="index+'a'">NO</label>
+                    </td> -->
+                    <td>
+                        <input :id = "index" type="radio" :name="index" value="6" v-model="aaa"><label :for="index">YES</label>
+                        <input :id="index+'a'" type="radio" :name="index" value="0" v-model="aaa" checked><label :for="index+'a'">NO</label>
+                    </td>
+                    <td class="Alright">{{aaa}}</td> 
+                    </tr>
+                    
+                </tbody>
+            </table>
+            <p id="falcon"></p>
+            <button v-on:click="register" class="btn btn-lg btn-primary" style="border-radius:10px;">登録</button>
+            <br>
+            <br>
+        </div>
+
+        <!-- ここから一覧 -->
+        <div v-if="toggle">
+            <h2>一覧</h2>
+            <!-- <table class="fixed" style="display:none;">
+                <thead>
+                    <tr>
+                        <th v-for = "header in headers" scope="col">{{header}}</th>
+                    </tr>
+                </thead>
+            </table> -->
+            <table class="sticked">
+                <thead>
+                    <tr>
+                        <th v-for = "header in headers" scope="col">{{header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(newinput,index) in newtrs"> 
+                        <td>{{index+1}}</td>
+                        <td>{{newinput.today}}</td>
+                        <td>{{newinput.newclient}}</td>
+                        <td>{{newinput.newyear}}</td>
+                        <td>{{newinput.newsales}}</td>
+                        <td>{{newinput.newcorr}}</td>
+                        <td>{{newinput.newporg}}</td>
+                        <div class="number_input"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></div>
+                        <td><span id ="trash" v-on:click="remove(index)" class="fas fa-trash-alt"></span></td>
+                    </tr>                                        
+                </tbody>
+            </table>
+            
+        </div>
+
+        <!-- モーダル表示-->
+        <div class="modal-back"></div>
+        <div id="regimodal" class="modal">
+            <div class="modal-title">
+                <p class="main-title">登録確認<span class="close-modal" v-on:click="cancel">×</span></p>
+            </div>
+            <div class="modal-contents">
+                <p>登録しますか？</p>
+                <div class="ynbutton">
+                    <button v-on:click="final" class="btn btn-primary">はい</button>
+                    <button v-on:click="cancel" class="btn btn-primary">いいえ</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-back"></div>
+        <div id="delete-row" class="modal">
+            <div class="modal-title">
+                <p class="main-title">削除確認<span class="close-modal" v-on:click="cancel">×</span></p>
+            </div>
+            <div class="modal-contents" v-for="(contents, index) in newtrs">
+                <p>{{index+1}}.{{contents.newclient}}を削除しますか？</p>
+                <div class="ynbutton">
+                    <button v-on:click="completedelete" class="btn btn-primary">はい</button>
+                    <button v-on:click="cancel" class="btn btn-primary">いいえ</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+</body>
+
+<script src="jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+<script>
+    var app = new Vue({
+        el : "#app",
+        data : { 
+            inputting:true,
+            toggle:false,
+            aaa:0,
+            client:"",
+            year:"",
+            sales:"",
+            corr:"",
+            porg:"",
+            questions:
+                [
+                    "JBCCが社長に定期的に会っている",
+                    "お客様との定例会、定期訪問を実施している（例、システム委員会）",
+                    "JBCCが直接 ビジネスをリードできる(価格や各種交渉)、他社ベンダーのアンダーでない",
+                    "お客様の情報システムの計画を理解している　また計画作りに支援、参画できる",
+                    "日々の活動で、多少のネゴが効く、お客様担当者がいる",
+                    "営業部門の方にコンタクトが取れている",
+                    "総務／人事部門の方にコンタクトが取れている",
+                    "経理部門の方にコンタクトが取れている",
+                    "経営企画（マーケティング）部門の方にコンタクトが取れている",
+                    "製造現場の方にコンタクトが取れている",
+                    "ＪＢＣＣセミナーに参加いただける",
+                    "ＪＢＣＣユーザー会に参加いただける",
+                    "ＬＯＢの方を紹介していただけたか",
+                    "他社情報を教えていただけたか",
+                    "食事や趣味を一緒に行ったことがあるか",
+                ],
+            headers:
+                [
+                    "No",
+                    "登録日",
+                    "顧客名",
+                    "年度",
+                    "担当営業",
+                    "継続/引継",
+                    "顧客ZONE",
+                    "1.社長訪問",
+                    "2.定例会",
+                    "3.ビジネスリード",
+                    "4.システム計画理解",
+                    "5.ネゴ",
+                    "小計",
+                    "6.営業",
+                    "7.総務/人事",
+                    "8.経理",
+                    "9.経営",
+                    "10.現場",
+                    "小計",
+                    "11.セミナー",
+                    "12.ユーザー会",
+                    "13.LOB紹介",
+                    "14.他社情報",
+                    "15.食事趣味",
+                    "小計",
+                    "合計",
+                    "削除"
+                ],
+            newtrs:[]
+        },
+        methods:{
+            customer:function(){
+                this.inputting = true
+                this.toggle = false
+                $('#customer').addClass('active')
+                $('#viewer').removeClass('active')
+            },
+            viewer:function(){
+                this.inputting = false
+                this.toggle = true
+                $('#viewer').addClass('active')
+                $('#customer').removeClass('active')
+            },
+            register:function(){
+                if(this.client==""||this.year==""||this.sales==""||this.coor==""||this.porg=="") {
+                    alert("全項目必須項目です")
+                }else{
+                    $('.modal-back, #regimodal').fadeIn();
+                }
+            },
+            final:function(){
+                var today = new Date();
+                var date = today.getDate();
+                var month = today.getMonth() + 1;
+                var year = today.getFullYear() % 100; 
+                year = addZero(year);
+                month = addZero(month);
+                date = addZero(date);
+                function addZero(value){
+                    if(value<10){
+                        return "0" + value;
+                    }else if(value===0){
+                        return "00";
+                    }else{
+                        return value;
+                    }
+                }
+                var regiyear = `${year}/${month}/${date}`;
+                var newtr = {
+                    today:regiyear,
+                    newclient:this.client,
+                    newyear:this.year,
+                    newsales:this.sales,
+                    newcorr:this.corr,
+                    newporg:this.porg
+                }
+                this.newtrs.push(newtr)
+                this.client=""
+                this.year=""
+                this.sales=""
+                this.corr=""
+                this.porg="",
+                this.inputting=false
+                this.toggle=true
+                $('.modal-back, .modal').fadeOut();
+                $('#viewer').addClass('active')
+                $('#customer').removeClass('active')
+            },
+            cancel:function(){
+                $('.modal-back, .modal').fadeOut();
+            },
+            remove:function(index){
+                $('.modal-back,#delete-row').fadeIn();
+            },
+            completedelete:function(index){
+                $('.modal-back, .modal').fadeOut();
+                this.newtrs.splice(index,1)
+            }
+        }
+        
+    })
+
+    // $(window).scroll(function(){
+    //     var high = $(window).scrollTop;
+    //     var korea = $('.Alright').val();
+    //     document.getElementById('falcon').appendChild(korea);
+    //     var off = $('.sticked').offset().top;
+    //     if(high>off){
+    //         $('.fixed').show();
+    //     }
+        
+    // });
+    
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
